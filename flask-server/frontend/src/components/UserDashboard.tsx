@@ -1,14 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageCircle, X, Search, Users, Sparkles, Loader2, Globe } from 'lucide-react';
+import { MessageCircle, Search, Users, Sparkles, Loader2, Globe } from 'lucide-react';
 import { EnhancedAIAssistant } from './EnhancedAIAssistant';
 import { apiService } from '../services/apiService';
 import type { Artist } from '../types';
-// @ts-ignore
-import { translations } from '../translations/languages.js';
-
-const cn = (...classes: (string | undefined | null | false)[]): string => {
-  return classes.filter(Boolean).join(' ');
-};
+import { translations } from '../translations/languages';
 
 export const UserDashboard: React.FC = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -29,7 +24,7 @@ export const UserDashboard: React.FC = () => {
 
   const searchResultsRef = useRef<HTMLDivElement>(null);
 
-  const t = translations[lang] || translations.en;
+  const t = (lang in translations ? translations[lang as keyof typeof translations] : translations.en);
 
   const toggleChat = () => setIsChatOpen(!isChatOpen);
 
@@ -341,7 +336,7 @@ export const UserDashboard: React.FC = () => {
     }
   }, [executedQuery, artists]);
 
-  // Lotus Logo Component
+  
   const LotusLogo: React.FC = () => (
     <div className="relative">
       <svg className="w-12 h-12 lotus-shadow floating" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -355,7 +350,7 @@ export const UserDashboard: React.FC = () => {
         <path d="M50 20 C35 25, 30 40, 50 50 C70 40, 65 25, 50 20 Z" fill="url(#lotusGradient)" opacity="0.9"/>
         <path d="M50 20 C40 30, 25 35, 30 55 C45 50, 50 35, 50 20 Z" fill="url(#lotusGradient)" opacity="0.8"/>
         <path d="M50 20 C60 30, 75 35, 70 55 C55 50, 50 35, 50 20 Z" fill="url(#lotusGradient)" opacity="0.8"/>
-        <path d="M30 55 C35 70, 50 75, 50 50 C50 35, 35 40, 30 55 Z" fill="url(#lotusGradient)" opacity="0.7"/>
+        <path d="M30 55 C35 70, 50 75, 50 50 C50 35, 65 40, 70 55 Z" fill="url(#lotusGradient)" opacity="0.7"/>
         <path d="M70 55 C65 70, 50 75, 50 50 C50 35, 65 40, 70 55 Z" fill="url(#lotusGradient)" opacity="0.7"/>
         <circle cx="50" cy="50" r="8" fill="#8b4513" opacity="0.8"/>
         <circle cx="50" cy="50" r="4" fill="#ffd23f"/>
@@ -421,7 +416,7 @@ export const UserDashboard: React.FC = () => {
       <section className="hero-pattern py-20 px-4 relative overflow-hidden">
         <div className="max-w-7xl mx-auto text-center relative z-10">
           <div className="border-4 border-double border-amber-300 rounded-3xl p-8 mb-8 soft-indian-flag-bg backdrop-blur-sm">
-            <h2 className="text-4xl md:text-6xl font-bold mb-4 heritage-text text-gray-800"> {/* Changed text color */}
+            <h2 className="text-4xl md:text-6xl font-bold mb-4 heritage-text text-gray-800">
               {t.dashboard.title}
             </h2>
             <h3 className="text-3xl md:text-5xl font-bold text-gray-800 mb-6" style={{fontFamily: 'Crimson Text, serif'}}>
@@ -484,7 +479,7 @@ export const UserDashboard: React.FC = () => {
               <h3 className="text-5xl font-bold text-amber-900 mb-2 heritage-text">
                 {executedQuery ? `Search Results (${filteredArtists.length})` : t.dashboard.featuredArtists}
               </h3>
-              <h4 className="text-3xl font-bold text-gray-800 mb-4" style={{fontFamily: 'Crimson Text, serif'}}>
+              <h4 className="3xl font-bold text-gray-800 mb-4" style={{fontFamily: 'Crimson Text, serif'}}>
                 {executedQuery ? "" : t.dashboard.featuredArtistsSubtitle}
               </h4>
             </div>
@@ -670,5 +665,4 @@ export const UserDashboard: React.FC = () => {
     </div>
   );
 };
-
 export default UserDashboard;

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Send, Bot, User, Phone, Mail, MapPin, Palette, Loader2, AlertCircle, Maximize, Minimize, X } from 'lucide-react';
+import { User, Phone, Mail, MapPin, Palette, Loader2, AlertCircle, Maximize, Minimize, X } from 'lucide-react';
 import { apiService, ChatResponse } from '../services/apiService';
 
 // Types
@@ -58,22 +58,6 @@ const ErrorMessage: React.FC<{ message: string; onRetry?: () => void }> = ({ mes
         Retry
       </button>
     )}
-  </div>
-);
-
-// Connection Status Component (re-styled)
-const ConnectionStatusIndicator: React.FC<{ status: ConnectionStatus; onReconnect: () => void }> = ({ 
-  status, 
-  onReconnect 
-}) => (
-  <div className="flex items-center space-x-2">
-    <div className={cn(
-      "w-3 h-3 rounded-full",
-      status.isConnected ? "bg-green-400" : "bg-red-400"
-    )}></div>
-    <span className="text-sm text-gray-600">
-      {status.isConnected ? "Online" : "Offline"}
-    </span>
   </div>
 );
 
@@ -404,7 +388,7 @@ export const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({ isMaxi
                 message.role === 'user'
                   ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-tr-md'
                   : 'bg-white text-gray-800 rounded-tl-md',
-                isMaximized ? 'max-w-xl' : 'max-w-md' // Conditional class for width
+                isMaximized ? 'max-w-xl' : 'max-w-md'
               )}
             >
               {message.role === 'assistant' ? (
@@ -540,10 +524,6 @@ export const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({ isMaxi
             )}
           </button>
         </form>
-        
-        <div className="flex items-center justify-end mt-3 text-xs text-gray-500">
-          <span className="text-gray-400">Press Enter to send</span>
-        </div>
       </div>
 
       {/* CSS from your HTML file */}
