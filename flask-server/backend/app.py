@@ -100,8 +100,18 @@ def extract_entities_from_query(query: str) -> Dict[str, Any]:
     entities = {}
     query_lower = query.lower()
     
-    craft_keywords = ['pottery', 'textile', 'weaving', 'embroidery', 'woodwork', 'metalwork', 'painting', 'jeweler', 'jewelry', 'carpet', 'tanjore', 'rogan', 'glass painting', 'jewelers']
-    location_keywords = ['delhi', 'rajasthan', 'tamil nadu', 'kolkata', 'mumbai', 'gujarat', 'satna', 'uttar pradesh']
+    craft_keywords = ['pottery', 'textile', 'weaving', 'embroidery', 'woodwork', 'metalwork', 'painting', 'jeweler', 'jewelry', 'carpet', 'tanjore', 'rogan', 'glass painting', 'jewelers', 'shell craft']
+    
+    # === NEW: Expanded location keywords for better recognition ===
+    location_keywords = [
+        'andhra pradesh', 'arunachal pradesh', 'assam', 'bihar', 'chhattisgarh', 'goa', 'gujarat', 
+        'haryana', 'himachal pradesh', 'jharkhand', 'karnataka', 'kerala', 'madhya pradesh', 
+        'maharashtra', 'manipur', 'meghalaya', 'mizoram', 'nagaland', 'odisha', 'punjab', 
+        'rajasthan', 'sikkim', 'tamil nadu', 'telangana', 'tripura', 'uttar pradesh', 
+        'uttarakhand', 'west bengal', 'up', 'ap', 'mp', 'tn', 'delhi', 'kolkata', 'mumbai', 
+        'chennai'
+    ]
+    # === END NEW ===
 
     craft_match = re.search(r'\b(' + '|'.join(re.escape(k) for k in craft_keywords) + r')\b', query_lower)
     if craft_match:
@@ -121,7 +131,6 @@ def search_artisans(query: str, max_results: int = 10) -> List[Dict]:
     
     matching_rows = pd.DataFrame()
     
-    # === NEW: Smarter search logic using entities first ===
     if 'craft_type' in entities and 'location' in entities:
         matching_rows = df[
             (df['craft_type'].str.lower().str.contains(entities['craft_type'], na=False)) &
@@ -132,7 +141,6 @@ def search_artisans(query: str, max_results: int = 10) -> List[Dict]:
     elif 'location' in entities:
         matching_rows = df[df['state'].str.lower().str.contains(entities['location'], na=False) | df['district'].str.lower().str.contains(entities['location'], na=False)]
     
-    # Fallback to simple keyword search if no entities were found or no matches were made
     if matching_rows.empty:
       irrelevant_terms = ['find', 'artists', 'show', 'get', 'list', 'i', 'need', 'in', 'from', 'for', 'a']
       search_terms = [word for word in query_lower.split() if word not in irrelevant_terms and len(word) > 2]
@@ -143,7 +151,6 @@ def search_artisans(query: str, max_results: int = 10) -> List[Dict]:
               for term in search_terms:
                   combined_mask &= df['search_text'].str.contains(term, na=False, regex=False)
           matching_rows = df[combined_mask]
-    # === END NEW ===
     
     results = []
     for _, row in matching_rows.head(max_results).iterrows():
