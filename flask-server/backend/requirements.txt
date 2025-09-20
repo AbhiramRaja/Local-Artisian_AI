@@ -1,0 +1,5 @@
+Flask
+Flask-Cors
+pandas
+google-generativeai
+python-dotenv
