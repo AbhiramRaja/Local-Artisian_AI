@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageCircle, Search, Users, Sparkles, Loader2, Globe } from 'lucide-react';
+import { MessageCircle, Search, Users, Sparkles, Loader2, Globe, ChevronDown } from 'lucide-react';
 import { EnhancedAIAssistant } from './EnhancedAIAssistant';
 import { apiService } from '../services/apiService';
 import type { Artist } from '../types';
@@ -9,10 +9,6 @@ import { translations } from '../translations/languages.js';
 export const UserDashboard: React.FC = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [showChatModal, setShowChatModal] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [executedQuery, setExecutedQuery] = useState('');
-  const [artists, setArtists] = useState<Artist[]>([]);
-  const [filteredArtists, setFilteredArtists] = useState<Artist[]>([]);
   const [stats, setStats] = useState({
     totalArtists: 0,
     totalCrafts: 0,
@@ -247,95 +243,26 @@ export const UserDashboard: React.FC = () => {
     };
   }, []);
 
-  // Helper function to safely get artist location data
-  const getArtistLocation = (artist: any) => {
-    return {
-      state: artist.location?.state || artist.state || 'State not specified',
-      district: artist.location?.district || artist.district || 'District not specified',
-      village: artist.location?.village || artist.village || ''
-    };
-  };
-
-  // Helper function to safely get artist contact data
-  const getArtistContact = (artist: any) => {
-    return {
-      phone: artist.contact?.phone || artist.contact_phone || artist.phone || 'Not available',
-      email: artist.contact?.email || artist.contact_email || artist.email || 'Not available'
-    };
-  };
-
-  // Helper function to safely get artist languages
-  const getArtistLanguages = (artist: any) => {
-    if (artist.languages && Array.isArray(artist.languages)) {
-      return artist.languages;
-    }
-    if (artist.languages_spoken) {
-      // Handle comma-separated string of languages
-      return artist.languages_spoken.split(',').map((lang: string) => lang.trim()).filter(Boolean);
-    }
-    return ['Hindi']; // Default fallback
-  };
-
   // Load data from API on component mount
   useEffect(() => {
     const loadData = async () => {
       try {
         setIsLoading(true);
-        
-        const [artistsResult, statsResult] = await Promise.all([
-          apiService.searchArtisans(""), 
-          apiService.getStatistics() 
-        ]);
-
-        setArtists(artistsResult.artists || []);
+        const statsResult = await apiService.getStatistics();
         setStats({
           totalArtists: statsResult.stats.total_artisans || 0,
           totalCrafts: statsResult.stats.unique_crafts || 0,
           totalStates: statsResult.stats.unique_states || 0,
         });
-        
       } catch (err) {
         console.error('Failed to load data:', err);
-        setError('Server temporarily unavailable - using cached data');
-        
-        setArtists([]); 
-        setStats({
-          totalArtists: 0,
-          totalCrafts: 0,
-          totalStates: 0,
-        });
+        setError('Server temporarily unavailable');
       } finally {
         setIsLoading(false);
       }
     };
-
     loadData();
   }, []);
-
-  // Handle search and scroll when executedQuery changes
-  useEffect(() => {
-    if (!executedQuery.trim()) {
-      setFilteredArtists(artists.slice(0, 12));
-    } else {
-      const filtered = artists.filter(artist => {
-        const location = getArtistLocation(artist);
-        const searchLower = executedQuery.toLowerCase();
-        
-        return (
-          (artist.name || '').toLowerCase().includes(searchLower) ||
-          (artist.craft_type || '').toLowerCase().includes(searchLower) ||
-          location.state.toLowerCase().includes(searchLower) ||
-          location.district.toLowerCase().includes(searchLower) ||
-          location.village.toLowerCase().includes(searchLower)
-        );
-      });
-      setFilteredArtists(filtered.slice(0, 20));
-      
-      if (searchResultsRef.current) {
-        searchResultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }
-  }, [executedQuery, artists]);
 
   
   const LotusLogo: React.FC = () => (
@@ -373,42 +300,19 @@ export const UserDashboard: React.FC = () => {
               </div>
             </div>
             
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                setExecutedQuery(searchQuery); 
-              }}
-              className="flex items-center space-x-4"
-            >
-              {/* Language Dropdown */}
-              <div className="relative">
+            <div className="relative group">
                 <select
                   value={lang}
                   onChange={(e) => setLang(e.target.value)}
-                  className="pl-3 pr-8 py-2 border-2 border-amber-300 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-400 bg-white/80 backdrop-blur-sm text-sm"
+                  className="appearance-none pl-4 pr-10 py-3 border-2 border-amber-300 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-400 bg-white/80 backdrop-blur-sm text-sm font-semibold text-amber-700 transition-colors"
                 >
                   <option value="en">English</option>
                   <option value="hi">हिन्दी</option>
                 </select>
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-amber-600 pointer-events-none">
-                  <Globe className="w-4 h-4" />
+                <div className="absolute inset-y-0 right-3 flex items-center text-amber-600 pointer-events-none group-hover:text-amber-800 transition-colors">
+                  <ChevronDown className="w-5 h-5" />
                 </div>
               </div>
-              
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amber-600 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder={t.dashboard.searchPlaceholder}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-4 py-3 w-80 border-2 border-amber-300 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-400 bg-white/80 backdrop-blur-sm heritage-text"
-                />
-              </div>
-              <button type="submit" className="modern-gradient text-white px-6 py-3 rounded-full button-hover button-press heritage-text font-semibold text-sm">
-                🔍 {t.dashboard.searchButton}
-              </button>
-            </form>
           </div>
         </div>
       </header>
@@ -469,140 +373,6 @@ export const UserDashboard: React.FC = () => {
             <div className="4xl floating" style={{animationDelay: '1.5s'}}>🧵</div>
             <div className="4xl floating" style={{animationDelay: '2s'}}>🎨</div>
           </div>
-        </div>
-      </section>
-
-      {/* Search Results Section - attach ref here */}
-      <section ref={searchResultsRef} className="py-20 px-4 paisley-pattern">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <div className="relative inline-block">
-              <h3 className="text-5xl font-bold text-amber-900 mb-2 heritage-text">
-                {executedQuery ? `Search Results (${filteredArtists.length})` : t.dashboard.featuredArtists}
-              </h3>
-              <h4 className="3xl font-bold text-gray-800 mb-4" style={{fontFamily: 'Crimson Text, serif'}}>
-                {executedQuery ? "" : t.dashboard.featuredArtistsSubtitle}
-              </h4>
-            </div>
-            <p className="text-amber-700 text-lg heritage-text bg-white/60 backdrop-blur-sm rounded-full px-8 py-3 inline-block border border-amber-200">
-              🌟 {t.dashboard.featuredArtistsSubtitle} 🌟
-            </p>
-          </div>
-          
-          {isLoading ? (
-            <div className="flex justify-center items-center py-20">
-              <div className="text-center craft-card rounded-3xl p-12 border-2 border-amber-200 bg-white/80 backdrop-blur-sm">
-                <Loader2 className="w-12 h-12 text-orange-600 animate-spin mx-auto mb-4" />
-                <p className="text-amber-800 heritage-text text-lg">{t.dashboard.stats.loading}</p>
-              </div>
-            </div>
-          ) : error ? (
-            <div className="text-center py-16 craft-card border-2 border-amber-200 rounded-3xl mx-4">
-              <div className="text-amber-500 mb-6">
-                <Sparkles className="w-10 h-10 text-amber-600 mx-auto mb-4 floating" />
-              </div>
-              <h4 className="2xl font-bold text-amber-900 mb-3 heritage-text">{t.dashboard.stats.backup}</h4>
-              <p className="text-amber-700 mb-4 max-w-md mx-auto heritage-text">
-                {error} 
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredArtists.map((artist) => {
-                const location = getArtistLocation(artist);
-                const contact = getArtistContact(artist);
-                const languages = getArtistLanguages(artist);
-                
-                return (
-                  <div key={artist.id || Math.random()} className="craft-card rounded-2xl p-6 border-2 border-amber-200 shadow-lg relative overflow-hidden">
-                    <div className="absolute top-0 right-0 bg-gradient-to-r from-emerald-400 to-green-400 text-white px-3 py-1 text-xs font-medium rounded-bl-lg flex items-center heritage-text">
-                      <span className="w-1.5 h-1.5 bg-white rounded-full mr-1.5"></span>
-                      {t.dashboard.available}
-                    </div>
-                    <div className="text-center mb-6">
-                      <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-orange-200 to-amber-200 rounded-full flex items-center justify-center floating">
-                        <Users className="w-10 h-10 text-orange-600" />
-                      </div>
-                      <h4 className="font-bold text-amber-900 text-lg mb-1 heritage-text leading-tight">{artist.name || 'Unknown Artist'}</h4>
-                      <div className="flex items-center justify-center text-amber-700 text-sm heritage-text">
-                        <span>{artist.age || 'N/A'} {t.dashboard.ageLabel}</span>
-                        <span className="mx-2 text-amber-400">•</span>
-                        <span className="capitalize">
-                          {artist.gender === 'male' ? t.dashboard.genderMale : artist.gender === 'female' ? t.dashboard.genderFemale : 'N/A'}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="space-y-4">
-                      <div className="bg-gradient-to-r from-purple-50 via-purple-25 to-pink-50 border-2 border-purple-200 rounded-xl p-4">
-                        <div className="text-center">
-                          <div className="text-3xl mb-2">🎨</div>
-                          <div className="font-bold text-purple-900 text-sm heritage-text">{artist.craft_type || 'Traditional Craft'}</div>
-                          <div className="text-xs text-purple-600 heritage-text">{t.dashboard.traditionalArtisan}</div>
-                        </div>
-                      </div>
-                      <div className="bg-gradient-to-r from-emerald-50 via-emerald-25 to-green-50 border-2 border-emerald-200 rounded-xl p-4">
-                        <div className="text-center">
-                          <div className="text-3xl mb-2">📍</div>
-                          <div className="font-bold text-emerald-900 text-sm heritage-text">{location.district}</div>
-                          <div className="text-xs text-emerald-600 heritage-text">{location.state}, भारत</div>
-                        </div>
-                      </div>
-                      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4">
-                        <div className="text-center mb-3">
-                          <div className="text-3xl mb-2">📞</div>
-                          <div className="text-xs text-blue-700 font-bold uppercase tracking-wide heritage-text">{t.dashboard.contactDetails}</div>
-                        </div>
-                        <div className="space-y-2 text-center">
-                          <div className="bg-white rounded-lg p-2 border">
-                            <span className="text-xs text-blue-600 font-medium heritage-text block">{t.dashboard.phoneLabel}</span>
-                            <span className="text-sm font-mono text-blue-800 font-bold">{contact.phone}</span>
-                          </div>
-                          <div className="bg-white rounded-lg p-2 border">
-                            <span className="text-xs text-blue-600 font-medium heritage-text block">{t.dashboard.emailLabel}</span>
-                            <span className="text-xs text-blue-700 font-mono break-all">{contact.email}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-xs text-amber-600 font-medium mb-2 heritage-text">{t.dashboard.languagesLabel}</div>
-                        <div className="flex flex-wrap gap-1 justify-center">
-                          {languages.slice(0, 3).map((lang: string, index: number) => (
-                            <span key={index} className="text-xs bg-amber-100 text-amber-800 px-3 py-1 rounded-full font-medium border-2 border-amber-200 heritage-text">
-                              {lang}
-                            </span>
-                          ))}
-                          {languages.length > 3 && (
-                            <span className="text-xs bg-orange-100 text-orange-800 px-3 py-1 rounded-full font-medium border-2 border-orange-200 heritage-text">
-                              +{languages.length - 3} {t.dashboard.moreLanguages}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex space-x-2 pt-2">
-                        <button className="flex-1 traditional-gradient text-white py-3 px-4 rounded-full font-semibold text-sm button-hover button-press heritage-text">
-                          {t.dashboard.contactButton}
-                        </button>
-                        <button className="warning-gradient text-white p-3 rounded-full button-hover button-press border-2 border-white/30">
-                          <Users className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-          
-          {filteredArtists.length === 0 && !isLoading && (
-            <div className="text-center py-16 craft-card border-2 border-amber-200 rounded-3xl mx-4">
-              <div className="text-6xl mb-6 floating">🔍</div>
-              <div className="text-amber-400 mb-4">
-                <Search className="w-16 h-16 mx-auto" />
-              </div>
-              <h4 className="text-xl font-semibold text-amber-800 mb-2 heritage-text">{t.dashboard.noArtists}</h4>
-              <p className="text-amber-600 heritage-text">खोज में समायोजन करें या AI सहायक से मदद लें</p>
-            </div>
-          )}
         </div>
       </section>
 

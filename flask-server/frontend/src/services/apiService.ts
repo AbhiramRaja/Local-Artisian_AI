@@ -69,6 +69,14 @@ interface HealthResponse {
   total_artisans: number;
 }
 
+interface ArtisansResponse {
+  artisans: any[];
+  total: number;
+  returned: number;
+  offset?: number;
+  limit?: number;
+}
+
 class ApiService {
   private baseUrl: string;
   private timeout: number;
@@ -176,6 +184,22 @@ class ApiService {
     );
   }
 
+  async getArtisans(options: {
+    limit?: number;
+    offset?: number;
+    featured?: boolean;
+  } = {}): Promise<ArtisansResponse> {
+    const { limit = 12, offset = 0, featured = true } = options;
+    
+    const params = new URLSearchParams({
+      limit: limit.toString(),
+      offset: offset.toString(),
+      featured: featured.toString()
+    });
+
+    return this.makeRequest<ArtisansResponse>(`/api/artisans?${params}`);
+  }
+
   // Legacy method to maintain compatibility with your original setup
   async sendQuery(query: string): Promise<{ response: string; status: string }> {
     return this.makeRequest<{ response: string; status: string }>('/api/chat', {
@@ -200,4 +224,5 @@ export type {
   SimilarArtistsResponse,
   UniqueValuesResponse,
   HealthResponse,
+  ArtisansResponse,
 };
