@@ -1,37 +1,59 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageCircle, Search, Users, Sparkles, Loader2, Globe, ChevronDown } from 'lucide-react';
+import { MessageCircle, ChevronDown, Sparkles } from 'lucide-react';
 import { EnhancedAIAssistant } from './EnhancedAIAssistant';
 import { apiService } from '../services/apiService';
-import type { Artist } from '../types';
 // @ts-ignore
 import { translations } from '../translations/languages.js';
 
+interface Stats {
+  totalArtists: number;
+  totalCrafts: number;
+  totalStates: number;
+}
+
+interface TranslationType {
+  dashboard: {
+    appName: string;
+    title: string;
+    titleSpan: string;
+    subtitle: string;
+    stats: {
+      verified: string;
+      crafts: string;
+      states: string;
+    };
+    cta: string;
+    ctaSubtitle: string;
+  };
+}
+
 export const UserDashboard: React.FC = () => {
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [showChatModal, setShowChatModal] = useState(false);
-  const [stats, setStats] = useState({
+  const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
+  const [showChatModal, setShowChatModal] = useState<boolean>(false);
+  const [stats, setStats] = useState<Stats>({
     totalArtists: 0,
     totalCrafts: 0,
     totalStates: 0,
   });
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [lang, setLang] = useState('en');
-  const [isMaximized, setIsMaximized] = useState(false);
+  const [lang, setLang] = useState<string>('en');
+  const [isMaximized, setIsMaximized] = useState<boolean>(false);
 
   const searchResultsRef = useRef<HTMLDivElement>(null);
 
-  const t = (lang in translations ? translations[lang as keyof typeof translations] : translations.en);
+  const t: TranslationType = (lang in translations ? translations[lang as keyof typeof translations] : translations.en);
 
-  const toggleChat = () => setIsChatOpen(!isChatOpen);
+  const toggleChat = (): void => setIsChatOpen(!isChatOpen);
 
   useEffect(() => {
     if (isChatOpen) {
       setShowChatModal(true);
     } else {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setShowChatModal(false);
       }, 300);
+      return () => clearTimeout(timer);
     }
   }, [isChatOpen]);
 
@@ -245,7 +267,7 @@ export const UserDashboard: React.FC = () => {
 
   // Load data from API on component mount
   useEffect(() => {
-    const loadData = async () => {
+    const loadData = async (): Promise<void> => {
       try {
         setIsLoading(true);
         const statsResult = await apiService.getStatistics();
@@ -285,6 +307,9 @@ export const UserDashboard: React.FC = () => {
       </svg>
     </div>
   );
+
+  // Suppress unused variable warnings for error, isLoading, and searchResultsRef
+  console.log({ error, isLoading, searchResultsRef });
 
   return (
     <div className="bg-gradient-to-br from-orange-50 via-yellow-50 to-red-50 mandala-bg">
