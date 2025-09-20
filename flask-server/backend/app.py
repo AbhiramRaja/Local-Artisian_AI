@@ -39,7 +39,7 @@ df = pd.DataFrame()
 try:
     csv_paths = [
         os.path.join(os.getcwd(), 'public', 'Artisans.csv'),
-        os.path.join(os.path.dirname(__file__), '..', 'public', 'Artisans.csv'),
+        os.path.join(os.path.dirname(__file__), '..', 'Artisans.csv'), # This is the corrected path
         os.path.join(os.path.dirname(__file__), 'Artisans.csv')
     ]
     
