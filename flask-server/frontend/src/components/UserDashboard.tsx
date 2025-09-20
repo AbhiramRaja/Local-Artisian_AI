@@ -3,7 +3,8 @@ import { MessageCircle, Search, Users, Sparkles, Loader2, Globe } from 'lucide-r
 import { EnhancedAIAssistant } from './EnhancedAIAssistant';
 import { apiService } from '../services/apiService';
 import type { Artist } from '../types';
-import { translations } from '../translations/languages';
+// @ts-ignore
+import { translations } from '../translations/languages.js';
 
 export const UserDashboard: React.FC = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -419,7 +420,7 @@ export const UserDashboard: React.FC = () => {
             <h2 className="text-4xl md:text-6xl font-bold mb-4 heritage-text text-gray-800">
               {t.dashboard.title}
             </h2>
-            <h3 className="text-3xl md:text-5xl font-bold text-gray-800 mb-6" style={{fontFamily: 'Crimson Text, serif'}}>
+            <h3 className="3xl font-bold text-gray-800 mb-6" style={{fontFamily: 'Crimson Text, serif'}}>
               {t.dashboard.titleSpan}
             </h3>
           </div>
@@ -463,10 +464,10 @@ export const UserDashboard: React.FC = () => {
           
           <div className="mt-12 flex justify-center space-x-8">
             <div className="text-4xl floating">🪔</div>
-            <div className="text-4xl floating" style={{animationDelay: '0.5s'}}>🕉</div>
-            <div className="text-4xl floating" style={{animationDelay: '1s'}}>🏺</div>
-            <div className="text-4xl floating" style={{animationDelay: '1.5s'}}>🧵</div>
-            <div className="text-4xl floating" style={{animationDelay: '2s'}}>🎨</div>
+            <div className="4xl floating" style={{animationDelay: '0.5s'}}>🕉</div>
+            <div className="4xl floating" style={{animationDelay: '1s'}}>🏺</div>
+            <div className="4xl floating" style={{animationDelay: '1.5s'}}>🧵</div>
+            <div className="4xl floating" style={{animationDelay: '2s'}}>🎨</div>
           </div>
         </div>
       </section>
@@ -500,7 +501,7 @@ export const UserDashboard: React.FC = () => {
               <div className="text-amber-500 mb-6">
                 <Sparkles className="w-10 h-10 text-amber-600 mx-auto mb-4 floating" />
               </div>
-              <h4 className="text-2xl font-bold text-amber-900 mb-3 heritage-text">{t.dashboard.stats.backup}</h4>
+              <h4 className="2xl font-bold text-amber-900 mb-3 heritage-text">{t.dashboard.stats.backup}</h4>
               <p className="text-amber-700 mb-4 max-w-md mx-auto heritage-text">
                 {error} 
               </p>

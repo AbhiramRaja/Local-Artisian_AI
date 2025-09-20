@@ -1,7 +1,7 @@
 // Path: /Users/abhi/Desktop/Local-Artisian_AI/flask-server/frontend/src/services/apiService.ts
 
 // API Service for connecting to the Flask backend
-const API_BASE_URL = import.meta.env.VITE_REACT_APP_API_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_REACT_APP_API_URL || 'https://local-artisian-ai.onrender.com/';
 
 // Define the data interfaces for the API.
 // This is crucial for type safety in a TypeScript project.
